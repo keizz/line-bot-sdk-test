@@ -1,0 +1,20 @@
+- name: mysql_replication
+  hosts: 192.168.1.68
+
+  tasks:
+  - name: mysql_replication
+    mysql_replication:
+        mode: "{{ item }}"
+        master_host: 192.168.1.67
+        master_log_file: mysql-master-bin.000003
+        master_log_pos: 6463
+        master_password: replicator!$#
+        master_port: 3306
+        master_user: replicator
+        login_user: root
+        login_password: root
+        login_unix_socket: /tmp/mysql.sock
+    with_items:
+        - changemaster
+        - startslave
+    tags: mysql_replication
