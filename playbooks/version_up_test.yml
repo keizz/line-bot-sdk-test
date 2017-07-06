@@ -1,0 +1,28 @@
+- name: DB Version Upgrade
+  hosts: mysql
+  vars:
+   base_dir: /mysql
+   old_dir: /mysql_old
+   new_dir: /tmp/mysql/mysql-5.6.33-linux-glibc2.5-x86_64
+   pwd: /home/ansible
+
+  tasks:
+  - name: stat check
+    stat: path=/mysql_old
+    register: old_dir_check
+
+  - name: DB Version Upgrade
+    command: "{{ item }}"
+    when: old_dir_check.stat.exists == False
+    with_items:
+        - /etc/init.d/mysqld stop
+        - mkdir -p /tmp/mysql/
+        - tar -xvf /mysql/binary/mysql-5.6.33-linux-glibc2.5-x86_64.tar.gz -C /tmp/mysql/
+        - mv "{{ base_dir }}" "{{ old_dir }}"
+        - mv "{{ new_dir }}" "{{ base_dir }}"
+        - chown -R mysql:mysql "{{ base_dir }}"
+        - /etc/init.d/mysqld start
+        - /mysql/bin/mysql_upgrade -uroot -p'root' >> /root/mysql_upgrade.log
+        - /etc/init.d/mysqld restart
+    tags: test
+

@@ -1,0 +1,8 @@
+- name: Set system hostname
+  hosts: mysql
+  gather_facts: false
+
+  tasks:
+  - name: Check rpm zlib version
+    command: bash -c 'rpm -qa | grep zlib'
+    tags: rpm_zlib
